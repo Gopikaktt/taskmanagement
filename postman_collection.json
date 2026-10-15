@@ -1,0 +1,514 @@
+{
+  "info": {
+    "name": "Task Management System API (v1)",
+    "_postman_id": "7b8e96f1-3d2b-4fa8-9d48-8df01822c9bb",
+    "description": "Comprehensive RESTful API for Task Management System featuring Multi-Auth (Admin and Staff), Sanctum token authentication, asynchronous task assignment notifications, and account eligibility verification.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "staff_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "1. Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('admin_token', jsonData.data.token);",
+                  "    console.log('Admin token saved successfully');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/login",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "login"]
+            }
+          }
+        },
+        {
+          "name": "2. Staff Login (Active & Verified)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('staff_token', jsonData.data.token);",
+                  "    console.log('Staff token saved successfully');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"staff@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/staff/login",
+              "host": ["{{base_url}}"],
+              "path": ["staff", "login"]
+            }
+          }
+        },
+        {
+          "name": "3. Staff Login (Deactivated - Tests 403 Forbidden)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"inactive.staff@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/staff/login",
+              "host": ["{{base_url}}"],
+              "path": ["staff", "login"]
+            }
+          }
+        },
+        {
+          "name": "4. Get Authenticated Profile (/me)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{admin_token}}", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/me",
+              "host": ["{{base_url}}"],
+              "path": ["me"]
+            }
+          }
+        },
+        {
+          "name": "5. Logout (Revoke Token)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{admin_token}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": ["{{base_url}}"],
+              "path": ["logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Projects",
+      "item": [
+        {
+          "name": "List Projects",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/admin/projects",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "projects"]
+            }
+          }
+        },
+        {
+          "name": "Create Project",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"AI Workflow Automation Suite\",\n  \"description\": \"Integrate LLM-driven automated task orchestration\",\n  \"status\": \"in_progress\",\n  \"start_date\": \"2026-10-15\",\n  \"end_date\": \"2026-12-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/projects",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "projects"]
+            }
+          }
+        },
+        {
+          "name": "Get Project by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/admin/projects/1",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "projects", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cloud Infrastructure Modernization - Phase 2\",\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/projects/1",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "projects", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Project",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/admin/projects/4",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "projects", "4"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Staff Members",
+      "item": [
+        {
+          "name": "List Staff Members",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/admin/staff",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "staff"]
+            }
+          }
+        },
+        {
+          "name": "Create Staff Member",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Michael Scott\",\n  \"email\": \"michael.scott@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"+1 555-0155\",\n  \"department\": \"Regional Management\",\n  \"is_active\": true,\n  \"is_verified\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/staff",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "staff"]
+            }
+          }
+        },
+        {
+          "name": "Toggle Staff Active Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/admin/staff/1/toggle-status",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "staff", "1", "toggle-status"]
+            }
+          }
+        },
+        {
+          "name": "Toggle Staff Email Verification",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/admin/staff/1/toggle-verification",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "staff", "1", "toggle-verification"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Tasks",
+      "item": [
+        {
+          "name": "List All Tasks",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/admin/tasks",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "tasks"]
+            }
+          }
+        },
+        {
+          "name": "Create Task (Dispatches Queued Background Notification)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project_id\": 1,\n  \"staff_id\": 1,\n  \"title\": \"Implement Zero-Trust Security Policies on VPC\",\n  \"description\": \"Configure ingress and egress network security rules with IAM boundary checks.\",\n  \"priority\": \"urgent\",\n  \"status\": \"pending\",\n  \"due_date\": \"2026-11-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/tasks",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "tasks"]
+            }
+          }
+        },
+        {
+          "name": "Get Task by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/admin/tasks/1",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "tasks", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"priority\": \"high\",\n  \"status\": \"in_progress\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/tasks/1",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "tasks", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Analytics",
+      "item": [
+        {
+          "name": "Get Dashboard Aggregate Stats",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/admin/stats",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff - Portal Endpoints",
+      "item": [
+        {
+          "name": "Staff Stats",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{staff_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/staff/stats",
+              "host": ["{{base_url}}"],
+              "path": ["staff", "stats"]
+            }
+          }
+        },
+        {
+          "name": "List My Assigned Tasks",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{staff_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/staff/tasks",
+              "host": ["{{base_url}}"],
+              "path": ["staff", "tasks"]
+            }
+          }
+        },
+        {
+          "name": "Get Assigned Task by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{staff_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/staff/tasks/1",
+              "host": ["{{base_url}}"],
+              "path": ["staff", "tasks", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Task Status (Staff)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{staff_token}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/staff/tasks/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["staff", "tasks", "1", "status"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
