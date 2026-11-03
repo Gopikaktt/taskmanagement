@@ -19,6 +19,7 @@ class StoreStaffRequest extends FormRequest
             'password' => ['required', 'string', 'min:6'],
             'phone' => ['nullable', 'string', 'max:30'],
             'department' => ['nullable', 'string', 'max:100'],
+            'role' => ['nullable', 'string'],
             'is_active' => ['sometimes', 'boolean'],
             'is_verified' => ['sometimes', 'boolean'],
         ];

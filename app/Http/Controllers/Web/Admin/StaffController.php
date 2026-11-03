@@ -9,16 +9,18 @@ use App\Models\Staff;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
+use Spatie\Permission\Models\Role;
 
 class StaffController extends Controller
 {
     /**
      * Display a listing of staff members.
      */
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
-        $query = Staff::withCount('tasks');
+        $query = Staff::with(['roles'])->withCount('tasks');
 
         if ($request->has('status') && $request->status !== '') {
             $query->where('is_active', $request->status === 'active');
@@ -40,15 +42,23 @@ class StaffController extends Controller
         $staff = $query->latest()->paginate(10)->withQueryString();
         $departments = Staff::distinct()->whereNotNull('department')->pluck('department');
 
-        return view('admin.staff.index', compact('staff', 'departments'));
+        return Inertia::render('Admin/Staff/Index', [
+            'staff' => $staff,
+            'departments' => $departments,
+            'filters' => $request->only(['search', 'status', 'department']),
+        ]);
     }
 
     /**
      * Show form for creating a new staff member.
      */
-    public function create(): View
+    public function create(): Response
     {
-        return view('admin.staff.create');
+        $roles = Role::where('guard_name', 'staff')->pluck('name');
+
+        return Inertia::render('Admin/Staff/Create', [
+            'roles' => $roles,
+        ]);
     }
 
     /**
@@ -57,11 +67,18 @@ class StaffController extends Controller
     public function store(StoreStaffRequest $request): RedirectResponse
     {
         $validated = $request->validated();
+        $role = $validated['role'] ?? null;
+        unset($validated['role']);
+
         $validated['password'] = Hash::make($validated['password']);
         $validated['is_active'] = $request->boolean('is_active', true);
         $validated['email_verified_at'] = $request->boolean('is_verified', true) ? now() : null;
 
-        Staff::create($validated);
+        $staff = Staff::create($validated);
+
+        if ($role) {
+            $staff->syncRoles([$role]);
+        }
 
         return redirect()->route('admin.staff.index')
             ->with('success', 'Staff member created successfully!');
@@ -70,9 +87,15 @@ class StaffController extends Controller
     /**
      * Show form for editing the staff member.
      */
-    public function edit(Staff $staff): View
+    public function edit(Staff $staff): Response
     {
-        return view('admin.staff.edit', compact('staff'));
+        $staff->load('roles');
+        $roles = Role::where('guard_name', 'staff')->pluck('name');
+
+        return Inertia::render('Admin/Staff/Edit', [
+            'staff' => $staff,
+            'roles' => $roles,
+        ]);
     }
 
     /**
@@ -81,6 +104,8 @@ class StaffController extends Controller
     public function update(UpdateStaffRequest $request, Staff $staff): RedirectResponse
     {
         $validated = $request->validated();
+        $role = $validated['role'] ?? null;
+        unset($validated['role']);
 
         if (! empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
@@ -92,6 +117,10 @@ class StaffController extends Controller
         $validated['email_verified_at'] = $request->boolean('is_verified') ? ($staff->email_verified_at ?? now()) : null;
 
         $staff->update($validated);
+
+        if ($role) {
+            $staff->syncRoles([$role]);
+        }
 
         return redirect()->route('admin.staff.index')
             ->with('success', 'Staff member updated successfully!');

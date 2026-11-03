@@ -58,6 +58,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
 Route::prefix('staff')->name('staff.')->middleware(['auth:staff', 'staff.active'])->group(function () {
     Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
     Route::get('/tasks', [StaffTaskController::class, 'index'])->name('tasks.index');
+    Route::get('/tasks/create', [StaffTaskController::class, 'create'])->name('tasks.create')->middleware('permission:create tasks,staff');
+    Route::post('/tasks', [StaffTaskController::class, 'store'])->name('tasks.store')->middleware('permission:create tasks,staff');
     Route::get('/tasks/{task}', [StaffTaskController::class, 'show'])->name('tasks.show');
     Route::patch('/tasks/{task}/status', [StaffTaskController::class, 'updateStatus'])->name('tasks.update-status');
+
+    Route::get('/manager-only-test', function () {
+        return '<h1 style="color: green; font-family: sans-serif; text-align: center; margin-top: 50px;">
+                    ✓ Access Granted: You are verified as a Manager!
+                </h1>';
+    })->middleware('role:manager,staff');
 });

@@ -25,7 +25,23 @@
                     {{ strtoupper(substr(Auth::guard('staff')->user()->name ?? 'S', 0, 1)) }}
                 </div>
                 <div>
-                    <div style="font-weight: 600;">{{ Auth::guard('staff')->user()->name ?? 'Staff Member' }}</div>
+                    <div style="font-weight: 600;">{{ Auth::guard('staff')->user()->name ?? 'Staff Member' }}
+                        @hasrole('manager','staff')
+                        <span style="background: #7c3aed; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 4px; font-weight: 700;">
+                ★ MANAGER
+            </span>
+            @elserole('team-lead','staff')
+            <span style="background: #2563eb; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 4px; font-weight: 700;">
+                ★ TEAM LEAD
+            </span>
+            @else
+            <span style="background: #94a3b8; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 4px; font-weight: 700;">
+                ★ MEMBER
+            </span>
+            @endhasrole
+                    </div>
+
+
                     <div style="font-size: 0.75rem; color: var(--text-muted);">{{ Auth::guard('staff')->user()->department ?? 'Staff' }}</div>
                 </div>
             </div>

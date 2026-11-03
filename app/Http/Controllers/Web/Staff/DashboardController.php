@@ -6,13 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Inertia\Inertia; 
+use Inertia\Response; 
 
 class DashboardController extends Controller
 {
     /**
      * Display the Staff Dashboard.
      */
-    public function index(): View
+    public function index(): Response
     {
         $staff = Auth::guard('staff')->user();
 
@@ -34,6 +36,6 @@ class DashboardController extends Controller
             ->take(6)
             ->get();
 
-        return view('staff.dashboard', compact('staff', 'stats', 'recentTasks'));
+        return Inertia::render('Staff/Dashboard',['staff'=>$staff,'stats'=>$stats,'recentTasks'=>$recentTasks]);
     }
 }

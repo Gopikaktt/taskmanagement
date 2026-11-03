@@ -6,14 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Staff;
 use App\Models\Task;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class DashboardController extends Controller
 {
     /**
      * Display the Admin Dashboard.
      */
-    public function index(): View
+    public function index(): Response
     {
         $stats = [
             'total_projects' => Project::count(),
@@ -49,6 +50,6 @@ class DashboardController extends Controller
             ->where('due_date', '<', now()->toDateString())
             ->first();
 
-        return view('admin.dashboard', compact('stats', 'recentTasks', 'recentProjects', 'staffMembers', 'firstOverdueTask'));
+        return Inertia::render('Admin/Dashboard', compact('stats', 'recentTasks', 'recentProjects', 'staffMembers', 'firstOverdueTask'));
     }
 }

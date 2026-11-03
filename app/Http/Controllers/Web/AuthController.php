@@ -9,22 +9,23 @@ use App\Models\Staff;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class AuthController extends Controller
 {
     /**
      * Landing / Welcome Page.
      */
-    public function home(): View
+    public function home(): Response
     {
-        return view('home');
+        return Inertia::render('Home');
     }
 
     /**
      * Show Admin Login form.
      */
-    public function showAdminLoginForm(Request $request): View|RedirectResponse
+    public function showAdminLoginForm(Request $request): Response|RedirectResponse
     {
         if (Auth::guard('admin')->check()) {
             return redirect()->route('admin.dashboard');
@@ -63,7 +64,7 @@ class AuthController extends Controller
             $rememberedPassword = 'password123';
         }
 
-        return view('auth.admin-login', compact('rememberedEmail', 'rememberedPassword'));
+        return Inertia::render('Auth/AdminLogin', compact('rememberedEmail', 'rememberedPassword'));
     }
 
     /**
@@ -109,7 +110,7 @@ class AuthController extends Controller
     /**
      * Show Staff Login form.
      */
-    public function showStaffLoginForm(Request $request): View|RedirectResponse
+    public function showStaffLoginForm(Request $request): Response|RedirectResponse
     {
         if (Auth::guard('staff')->check()) {
             return redirect()->route('staff.dashboard');
@@ -143,7 +144,7 @@ class AuthController extends Controller
             }
         }
 
-        return view('auth.staff-login', compact('rememberedEmail', 'rememberedPassword'));
+        return Inertia::render('Auth/StaffLogin', compact('rememberedEmail', 'rememberedPassword'));
     }
 
     /**

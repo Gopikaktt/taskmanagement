@@ -12,14 +12,15 @@ use App\Models\Task;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class TaskController extends Controller
 {
     /**
      * Display a listing of tasks.
      */
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $query = Task::with(['project', 'assignedStaff', 'creator']);
 
@@ -57,19 +58,28 @@ class TaskController extends Controller
         $projects = Project::orderBy('name')->get();
         $staffMembers = Staff::where('is_active', true)->orderBy('name')->get();
 
-        return view('admin.tasks.index', compact('tasks', 'projects', 'staffMembers'));
+        return Inertia::render('Admin/Tasks/Index', [
+            'tasks' => $tasks,
+            'projects' => $projects,
+            'staffMembers' => $staffMembers,
+            'filters' => $request->only(['search', 'project_id', 'staff_id', 'priority', 'status', 'overdue']),
+        ]);
     }
 
     /**
      * Show the form for creating a new task.
      */
-    public function create(Request $request): View
+    public function create(Request $request): Response
     {
         $projects = Project::orderBy('name')->get();
         $staffMembers = Staff::where('is_active', true)->orderBy('name')->get();
         $selectedProjectId = $request->input('project_id');
 
-        return view('admin.tasks.create', compact('projects', 'staffMembers', 'selectedProjectId'));
+        return Inertia::render('Admin/Tasks/Create', [
+            'projects' => $projects,
+            'staffMembers' => $staffMembers,
+            'selectedProjectId' => $selectedProjectId,
+        ]);
     }
 
     /**
@@ -101,21 +111,27 @@ class TaskController extends Controller
     /**
      * Display the specified task.
      */
-    public function show(Task $task): View
+    public function show(Task $task): Response
     {
         $task->load(['project', 'assignedStaff', 'creator']);
-        return view('admin.tasks.show', compact('task'));
+        return Inertia::render('Admin/Tasks/Show', [
+            'task' => $task,
+        ]);
     }
 
     /**
      * Show the form for editing the task.
      */
-    public function edit(Task $task): View
+    public function edit(Task $task): Response
     {
         $projects = Project::orderBy('name')->get();
         $staffMembers = Staff::where('is_active', true)->orderBy('name')->get();
 
-        return view('admin.tasks.edit', compact('task', 'projects', 'staffMembers'));
+        return Inertia::render('Admin/Tasks/Edit', [
+            'task' => $task,
+            'projects' => $projects,
+            'staffMembers' => $staffMembers,
+        ]);
     }
 
     /**

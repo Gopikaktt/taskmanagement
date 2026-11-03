@@ -239,4 +239,3 @@ A complete Postman Collection file is provided in the repository root:
 - [x] Seeders & Factories with default Admin and Staff accounts
 - [x] Eloquent ORM & Relationships
 - [x] Postman Collection export included (`postman_collection.json`)
-- [x] 100% passing automated test suite (22 tests, 89 assertions)

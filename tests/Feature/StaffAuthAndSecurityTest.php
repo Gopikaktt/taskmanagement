@@ -57,9 +57,11 @@ class StaffAuthAndSecurityTest extends TestCase
             ->get('/staff/login');
 
         $loginResponse->assertStatus(200);
-        $loginResponse->assertSee('value="staff.remember@example.com"', false);
-        $loginResponse->assertSee('value="password123"', false);
-        $loginResponse->assertSee('checked', false);
+        $loginResponse->assertInertia(fn ($page) => $page
+            ->component('Auth/StaffLogin')
+            ->where('rememberedEmail', 'staff.remember@example.com')
+            ->where('rememberedPassword', 'password123')
+        );
     }
 
     public function test_inactive_staff_is_blocked_from_web_login(): void

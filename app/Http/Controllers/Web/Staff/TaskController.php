@@ -4,18 +4,20 @@ namespace App\Http\Controllers\Web\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateTaskStatusRequest;
+use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class TaskController extends Controller
 {
     /**
      * Display a listing of assigned tasks.
      */
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $staff = Auth::guard('staff')->user();
 
@@ -40,13 +42,46 @@ class TaskController extends Controller
 
         $tasks = $query->latest()->paginate(10)->withQueryString();
 
-        return view('staff.tasks.index', compact('tasks'));
+        return Inertia::render('Staff/Tasks/Index', [
+            'tasks' => $tasks,
+            'filters' => $request->only(['search', 'status', 'priority']),
+        ]);
+    }
+
+    /**
+     * Show form for creating a task (staff with 'create tasks' permission).
+     */
+    public function create(): Response
+    {
+        $projects = Project::orderBy('name')->get();
+        return Inertia::render('Staff/Tasks/Create', compact('projects'));
+    }
+
+    /**
+     * Store a new task created by staff.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'project_id' => 'required|exists:projects,id',
+            'description' => 'nullable|string',
+            'priority' => 'required|in:low,medium,high,urgent',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $validated['staff_id'] = Auth::guard('staff')->id();
+        $validated['status'] = 'pending';
+
+        Task::create($validated);
+
+        return redirect()->route('staff.tasks.index')->with('success', 'Task created successfully!');
     }
 
     /**
      * Display the specified assigned task.
      */
-    public function show(Task $task): View
+    public function show(Task $task): Response
     {
         $staff = Auth::guard('staff')->user();
 
@@ -57,7 +92,7 @@ class TaskController extends Controller
 
         $task->load(['project', 'creator']);
 
-        return view('staff.tasks.show', compact('task'));
+        return Inertia::render('Staff/Tasks/Show', compact('task'));
     }
 
     /**

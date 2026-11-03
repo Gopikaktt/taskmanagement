@@ -8,13 +8,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class Staff extends Authenticatable
 {
     /** @use HasFactory<StaffFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable,HasRoles;
 
     protected $table = 'staff';
+
+    protected $guard_name = 'staff';
 
     /**
      * The attributes that are mass assignable.

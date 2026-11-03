@@ -10,14 +10,15 @@ use App\Models\Staff;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ProjectController extends Controller
 {
     /**
      * Display a listing of projects.
      */
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $query = Project::with(['creator'])->withCount('tasks');
 
@@ -35,15 +36,18 @@ class ProjectController extends Controller
 
         $projects = $query->latest()->paginate(9)->withQueryString();
 
-        return view('admin.projects.index', compact('projects'));
+        return Inertia::render('Admin/Projects/Index', [
+            'projects' => $projects,
+            'filters' => $request->only(['search', 'status']),
+        ]);
     }
 
     /**
      * Show form for creating a new project.
      */
-    public function create(): View
+    public function create(): Response
     {
-        return view('admin.projects.create');
+        return Inertia::render('Admin/Projects/Create');
     }
 
     /**
@@ -63,20 +67,25 @@ class ProjectController extends Controller
     /**
      * Display the specified project.
      */
-    public function show(Project $project): View
+    public function show(Project $project): Response
     {
         $project->load(['creator', 'tasks.assignedStaff']);
         $staffMembers = Staff::where('is_active', true)->orderBy('name')->get();
 
-        return view('admin.projects.show', compact('project', 'staffMembers'));
+        return Inertia::render('Admin/Projects/Show', [
+            'project' => $project,
+            'staffMembers' => $staffMembers,
+        ]);
     }
 
     /**
      * Show form for editing the project.
      */
-    public function edit(Project $project): View
+    public function edit(Project $project): Response
     {
-        return view('admin.projects.edit', compact('project'));
+        return Inertia::render('Admin/Projects/Edit', [
+            'project' => $project,
+        ]);
     }
 
     /**

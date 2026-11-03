@@ -16,7 +16,7 @@ class AdminAuthTest extends TestCase
         $response = $this->get('/admin/login');
 
         $response->assertStatus(200);
-        $response->assertSee('Admin Portal');
+        $response->assertInertia(fn ($page) => $page->component('Auth/AdminLogin'));
     }
 
     public function test_admin_can_authenticate_via_web_session(): void
@@ -61,9 +61,11 @@ class AdminAuthTest extends TestCase
             ->get('/admin/login');
 
         $loginResponse->assertStatus(200);
-        $loginResponse->assertSee('value="admin.remember@example.com"', false);
-        $loginResponse->assertSee('value="password123"', false);
-        $loginResponse->assertSee('checked', false);
+        $loginResponse->assertInertia(fn ($page) => $page
+            ->component('Auth/AdminLogin')
+            ->where('rememberedEmail', 'admin.remember@example.com')
+            ->where('rememberedPassword', 'password123')
+        );
     }
 
     public function test_admin_cannot_login_with_invalid_credentials(): void
