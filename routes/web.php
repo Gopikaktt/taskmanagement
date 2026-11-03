@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\Web\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Web\Admin\ProjectController as AdminProjectController;
-use App\Http\Controllers\Web\Admin\StaffController as AdminStaffController;
-use App\Http\Controllers\Web\Admin\TaskController as AdminTaskController;
-use App\Http\Controllers\Web\AuthController;
-use App\Http\Controllers\Web\Staff\DashboardController as StaffDashboardController;
-use App\Http\Controllers\Web\Staff\TaskController as StaffTaskController;
+use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Api\Admin\ProjectController as AdminProjectController;
+use App\Http\Controllers\Api\Admin\StaffController as AdminStaffController;
+use App\Http\Controllers\Api\Admin\TaskController as AdminTaskController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Staff\DashboardController as StaffDashboardController;
+use App\Http\Controllers\Api\Staff\TaskController as StaffTaskController;
 use Illuminate\Support\Facades\Route;
 
 /*

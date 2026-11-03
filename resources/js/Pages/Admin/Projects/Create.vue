@@ -38,7 +38,6 @@ const submit = () => {
                     <input v-model="form.name" 
                            type="text" 
                            required 
-                           placeholder="e.g. Mobile Application v2"
                            style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; box-sizing: border-box; outline: none;">
                     <div v-if="form.errors.name" style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">
                         {{ form.errors.name }}
@@ -52,7 +51,6 @@ const submit = () => {
                     </label>
                     <textarea v-model="form.description" 
                               rows="3" 
-                              placeholder="Project goals, objectives, and deliverables..."
                               style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; box-sizing: border-box; outline: none;"></textarea>
                     <div v-if="form.errors.description" style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">
                         {{ form.errors.description }}

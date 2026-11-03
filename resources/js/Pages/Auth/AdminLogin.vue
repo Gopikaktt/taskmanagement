@@ -21,27 +21,22 @@ const submit = () => {
         onFinish: () => form.reset('password'),
     });
 };
-
-const fillDemo = (email, password) => {
-    form.email = email;
-    form.password = password;
-};
 </script>
 
 <template>
     <div style="min-height: 100vh; background-color: var(--bg-body, #f8fafc); font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
         <!-- Navbar -->
-        <nav style="background: white; border-bottom: 1px solid #e2e8f0; padding: 0.75rem 1.5rem;">
+        <nav style="background: white; border-bottom: 1px solid #e2e8f0; padding: 0.85rem 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
             <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
-                <Link href="/" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #0f172a; font-weight: 700; font-size: 1.15rem;">
-                    <div style="width: 30px; height: 30px; border-radius: 6px; background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.85rem;">
+                <Link href="/" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0f172a; font-weight: 700; font-size: 1.25rem;">
+                    <div style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.25);">
                         <i class="fa-solid fa-layer-group"></i>
                     </div>
                     <span>TaskFlow</span>
                 </Link>
 
-                <Link href="/staff/login" style="background: #f8fafc; border: 1px solid #cbd5e1; color: #475569; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="fa-solid fa-user-check"></i> Staff Login &rarr;
+                <Link href="/staff/login" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 0.55rem 1.15rem; border-radius: 8px; text-decoration: none; font-size: 0.875rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25); transition: opacity 0.2s ease;">
+                    <i class="fa-solid fa-user-check"></i> Staff Login
                 </Link>
             </div>
         </nav>
@@ -110,16 +105,6 @@ const fillDemo = (email, password) => {
                         <i class="fa-solid fa-right-to-bracket"></i> {{ form.processing ? 'Signing in...' : 'Sign In' }}
                     </button>
                 </form>
-
-                <!-- Quick Demo Logins -->
-                <div style="margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid #f1f5f9; text-align: center;">
-                    <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;">
-                        Quick Demo Account
-                    </div>
-                    <button type="button" @click="fillDemo('admin@example.com', 'password123')" style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #475569; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-weight: 500;">
-                        System Administrator (admin@example.com)
-                    </button>
-                </div>
             </div>
         </div>
     </div>

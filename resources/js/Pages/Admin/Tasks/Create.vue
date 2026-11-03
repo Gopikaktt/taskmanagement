@@ -47,7 +47,6 @@ const submit = () => {
                     <input v-model="form.title" 
                            type="text" 
                            required 
-                           placeholder="e.g. Implement OAuth SSO Integration" 
                            style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; outline: none; box-sizing: border-box;">
                     <div v-if="form.errors.title" style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ form.errors.title }}</div>
                 </div>
@@ -89,7 +88,6 @@ const submit = () => {
                     </label>
                     <textarea v-model="form.description" 
                               rows="4" 
-                              placeholder="Provide technical specifications, acceptance criteria, or context..." 
                               style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; outline: none; resize: vertical; box-sizing: border-box;"></textarea>
                     <div v-if="form.errors.description" style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ form.errors.description }}</div>
                 </div>

@@ -1,22 +1,23 @@
 <?php
 
-namespace App\Http\Controllers\Web\Staff;
+namespace App\Http\Controllers\Api\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Models\Task;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
-use Inertia\Inertia; 
-use Inertia\Response; 
+use Inertia\Inertia;
+use Inertia\Response;
 
 class DashboardController extends Controller
 {
     /**
-     * Display the Staff Dashboard.
+     * Display the Staff Dashboard (Supports both API JSON and Inertia Web).
      */
-    public function index(): Response
+    public function index(Request $request): JsonResponse|Response
     {
-        $staff = Auth::guard('staff')->user();
+        $staff = $request->user() ?? Auth::guard('staff')->user();
 
         $stats = [
             'total_assigned' => Task::where('staff_id', $staff->id)->count(),
@@ -36,6 +37,22 @@ class DashboardController extends Controller
             ->take(6)
             ->get();
 
-        return Inertia::render('Staff/Dashboard',['staff'=>$staff,'stats'=>$stats,'recentTasks'=>$recentTasks]);
+        if ($request->is('api/*') || ($request->wantsJson() && !$request->header('X-Inertia'))) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'staff' => $staff,
+                    'stats' => $stats,
+                    'recent_tasks' => $recentTasks,
+                ],
+            ]);
+        }
+
+        return Inertia::render('Staff/Dashboard', [
+            'staff' => $staff,
+            'stats' => $stats,
+            'recentTasks' => $recentTasks,
+        ]);
     }
 }
+

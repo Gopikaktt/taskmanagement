@@ -77,6 +77,15 @@ const formatDateTime = (dateStr) => {
                     }">
                         {{ task.status.replace('_', ' ') }}
                     </span>
+                    <span style="color: #cbd5e1;">&bull;</span>
+                    <span v-if="task.created_by_type === 'admin'" 
+                          style="background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                        <i class="fa-solid fa-shield-halved"></i> Admin Created
+                    </span>
+                    <span v-else 
+                          style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                        <i class="fa-solid fa-user-pen"></i> Staff Created
+                    </span>
                 </div>
                 <h1 style="font-size: 1.8rem; font-weight: 700; color: #0f172a; margin: 0;">{{ task.title }}</h1>
             </div>
@@ -159,8 +168,17 @@ const formatDateTime = (dateStr) => {
                         <!-- Created By -->
                         <div>
                             <div style="color: #64748b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Created By</div>
-                            <div style="margin-top: 4px; color: #334155; font-weight: 500;">
-                                {{ task.creator?.name || 'Administrator' }}
+                            <div style="margin-top: 6px;">
+                                <div v-if="task.created_by_type === 'admin'" style="display: inline-flex; align-items: center; gap: 6px; background: #eef2ff; border: 1px solid #c7d2fe; color: #4338ca; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                    <span>Administrator</span>
+                                    <span v-if="task.creator?.name" style="font-weight: 500; opacity: 0.85;">({{ task.creator.name }})</span>
+                                </div>
+                                <div v-else style="display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
+                                    <i class="fa-solid fa-user-pen"></i>
+                                    <span>Staff Member</span>
+                                    <span v-if="task.assigned_staff?.name" style="font-weight: 500; opacity: 0.85;">({{ task.assigned_staff.name }})</span>
+                                </div>
                             </div>
                         </div>
                     </div>

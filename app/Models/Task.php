@@ -35,6 +35,11 @@ class Task extends Model
         ];
     }
 
+    protected $appends = [
+        'is_overdue',
+        'created_by_type',
+    ];
+
     /**
      * Project this task belongs to.
      */
@@ -69,6 +74,14 @@ class Task extends Model
         }
 
         return $this->due_date->isPast();
+    }
+
+    /**
+     * Determine whether the task was created by an admin or staff member.
+     */
+    public function getCreatedByTypeAttribute(): string
+    {
+        return !empty($this->created_by) ? 'admin' : 'staff';
     }
 
     /**
