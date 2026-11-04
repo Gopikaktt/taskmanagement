@@ -93,10 +93,31 @@ class TaskController extends Controller
     }
 
     /**
+     * Authorize task management permissions for the authenticated admin.
+     */
+    protected function authorizeTaskManagement(Request $request): void
+    {
+        $admin = $request->user() ?? Auth::guard('admin')->user();
+
+        if (! $admin || ! $admin->can('manage tasks')) {
+            if ($request->is('api/*') || ($request->wantsJson() && !$request->header('X-Inertia'))) {
+                abort(response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized: You do not have permission to manage tasks.',
+                ], 403));
+            }
+
+            abort(403, 'Unauthorized: You do not have permission to manage tasks.');
+        }
+    }
+
+    /**
      * Show the form for creating a new task.
      */
     public function create(Request $request): Response
     {
+        $this->authorizeTaskManagement($request);
+
         $projects = Project::orderBy('name')->get();
         $staffMembers = Staff::where('is_active', true)->orderBy('name')->get();
         $selectedProjectId = $request->query('project_id');
@@ -113,6 +134,8 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request): JsonResponse|RedirectResponse
     {
+        $this->authorizeTaskManagement($request);
+
         $validated = $request->validated();
         $validated['created_by'] = Auth::guard('admin')->id() ?? $request->user()?->id;
 
@@ -166,6 +189,8 @@ class TaskController extends Controller
      */
     public function edit(Task $task): Response
     {
+        $this->authorizeTaskManagement(request());
+
         $projects = Project::orderBy('name')->get();
         $staffMembers = Staff::where('is_active', true)->orderBy('name')->get();
         $task->load(['project', 'assignedStaff']);
@@ -182,6 +207,8 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task): JsonResponse|RedirectResponse
     {
+        $this->authorizeTaskManagement($request);
+
         $oldStaffId = $task->staff_id;
         $validated = $request->validated();
 
@@ -220,6 +247,8 @@ class TaskController extends Controller
      */
     public function destroy(Request $request, Task $task): JsonResponse|RedirectResponse
     {
+        $this->authorizeTaskManagement($request);
+
         $task->delete();
 
         if ($request->is('api/*') || ($request->wantsJson() && !$request->header('X-Inertia'))) {

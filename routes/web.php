@@ -42,7 +42,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
     Route::resource('projects', AdminProjectController::class);
 
     // Staff Management
-    Route::resource('staff', AdminStaffController::class);
+    Route::resource('staff', AdminStaffController::class)->middleware('role:super-admin,admin');
     Route::patch('/staff/{staff}/toggle-status', [AdminStaffController::class, 'toggleStatus'])->name('staff.toggle-status');
     Route::patch('/staff/{staff}/toggle-verification', [AdminStaffController::class, 'toggleVerification'])->name('staff.toggle-verification');
 

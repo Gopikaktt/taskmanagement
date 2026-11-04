@@ -68,10 +68,31 @@ class StaffController extends Controller
     }
 
     /**
+     * Authorize staff management permissions for the authenticated admin.
+     */
+    protected function authorizeStaffManagement(Request $request): void
+    {
+        $admin = $request->user() ?? Auth::guard('admin')->user();
+
+        if (! $admin || ! $admin->can('manage staff')) {
+            if ($request->is('api/*') || ($request->wantsJson() && !$request->header('X-Inertia'))) {
+                abort(response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized: You do not have permission to manage staff members.',
+                ], 403));
+            }
+
+            abort(403, 'Unauthorized: You do not have permission to manage staff members.');
+        }
+    }
+
+    /**
      * Show form for creating a new staff member.
      */
     public function create(): Response
     {
+        $this->authorizeStaffManagement(request());
+
         $roles = Role::where('guard_name', 'staff')->pluck('name');
 
         return Inertia::render('Admin/Staff/Create', [
@@ -84,6 +105,8 @@ class StaffController extends Controller
      */
     public function store(StoreStaffRequest $request): JsonResponse|RedirectResponse
     {
+        $this->authorizeStaffManagement($request);
+
         $validated = $request->validated();
         $role = $validated['role'] ?? null;
         unset($validated['role']);
@@ -137,6 +160,8 @@ class StaffController extends Controller
      */
     public function edit(Staff $staff): Response
     {
+        $this->authorizeStaffManagement(request());
+
         $staff->load('roles');
         $roles = Role::where('guard_name', 'staff')->pluck('name');
 
@@ -151,6 +176,8 @@ class StaffController extends Controller
      */
     public function update(UpdateStaffRequest $request, Staff $staff): JsonResponse|RedirectResponse
     {
+        $this->authorizeStaffManagement($request);
+
         $validated = $request->validated();
         $role = $validated['role'] ?? null;
         unset($validated['role']);
@@ -189,6 +216,8 @@ class StaffController extends Controller
      */
     public function destroy(Request $request, Staff $staff): JsonResponse|RedirectResponse
     {
+        $this->authorizeStaffManagement($request);
+
         $staff->delete();
 
         if ($request->is('api/*') || ($request->wantsJson() && !$request->header('X-Inertia'))) {
@@ -207,6 +236,8 @@ class StaffController extends Controller
      */
     public function toggleStatus(Request $request, Staff $staff): JsonResponse|RedirectResponse
     {
+        $this->authorizeStaffManagement($request);
+
         $staff->is_active = ! $staff->is_active;
         $staff->save();
 
@@ -228,6 +259,8 @@ class StaffController extends Controller
      */
     public function toggleVerification(Request $request, Staff $staff): JsonResponse|RedirectResponse
     {
+        $this->authorizeStaffManagement($request);
+
         $staff->email_verified_at = $staff->email_verified_at ? null : now();
         $staff->save();
 

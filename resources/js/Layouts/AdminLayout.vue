@@ -49,7 +49,8 @@ const isCurrentUrl = (path) => {
                             <i class="fa-solid fa-chart-pie"></i> Dashboard
                         </Link>
 
-                        <Link href="/admin/projects" 
+                        <Link v-if="can('manage projects')" 
+                              href="/admin/projects" 
                               :style="{
                                   display: 'inline-flex',
                                   alignItems: 'center',
@@ -65,7 +66,8 @@ const isCurrentUrl = (path) => {
                             <i class="fa-solid fa-folder-tree"></i> Projects
                         </Link>
 
-                        <Link href="/admin/tasks" 
+                        <Link v-if="can('manage tasks')" 
+                              href="/admin/tasks" 
                               :style="{
                                   display: 'inline-flex',
                                   alignItems: 'center',
@@ -81,7 +83,8 @@ const isCurrentUrl = (path) => {
                             <i class="fa-solid fa-list-check"></i> Tasks
                         </Link>
 
-                        <Link href="/admin/staff" 
+                        <Link v-if="can('manage staff')" 
+                              href="/admin/staff" 
                               :style="{
                                   display: 'inline-flex',
                                   alignItems: 'center',
@@ -108,7 +111,16 @@ const isCurrentUrl = (path) => {
                         <div>
                             <div style="font-weight: 600; font-size: 0.875rem; color: #1e293b; display: flex; align-items: center; gap: 6px;">
                                 {{ authUser?.name || 'Administrator' }}
-                                <span style="background: #4f46e5; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700;">
+                                <span v-if="hasRole('super-admin')" style="background: #4f46e5; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700;">
+                                    SUPER ADMIN
+                                </span>
+                                <span v-else-if="hasRole('project-admin')" style="background: #0284c7; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700;">
+                                    PROJECT ADMIN
+                                </span>
+                                <span v-else-if="hasRole('auditor')" style="background: #64748b; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700;">
+                                    AUDITOR
+                                </span>
+                                <span v-else style="background: #4f46e5; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700;">
                                     ADMIN
                                 </span>
                             </div>

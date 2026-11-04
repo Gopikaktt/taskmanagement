@@ -45,7 +45,7 @@ const statusBadgeColor = (s) => {
                 <h1 style="font-size: 1.8rem; font-weight: 700; color: #0f172a; margin: 0;">Projects</h1>
                 <p style="color: #64748b; margin-top: 4px; font-size: 0.95rem;">Track, monitor, and deliver organizational initiatives.</p>
             </div>
-            <Link href="/admin/projects/create" style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: white; padding: 9px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);">
+            <Link v-if="can('manage projects')" href="/admin/projects/create" style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: white; padding: 9px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);">
                 <i class="fa-solid fa-plus"></i> Create Project
             </Link>
         </div>

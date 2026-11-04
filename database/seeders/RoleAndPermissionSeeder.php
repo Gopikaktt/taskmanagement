@@ -37,6 +37,7 @@ class RoleAndPermissionSeeder extends Seeder
         $managerRole  = Role::firstOrCreate(['name' => 'manager', 'guard_name' => $staffGuard]);
         $teamLeadRole = Role::firstOrCreate(['name' => 'team-lead', 'guard_name' => $staffGuard]);
         $memberRole   = Role::firstOrCreate(['name' => 'member', 'guard_name' => $staffGuard]);
+        $internRole   = Role::firstOrCreate(['name' => 'intern', 'guard_name' => $staffGuard]);
 
         // 1. Manager has ALL permissions
         $managerRole->syncPermissions($staffPermissions);
@@ -46,6 +47,8 @@ class RoleAndPermissionSeeder extends Seeder
 
         // 3. Member has view, edit, and create permissions
         $memberRole->syncPermissions(['view tasks', 'edit tasks', 'create tasks']);
+
+        $internRole->syncPermissions(['view tasks']);
 
         // Assign 'manager' to primary staff (John Doe)
         $johnDoe = Staff::where('email', 'staff@example.com')->first();
@@ -86,6 +89,11 @@ class RoleAndPermissionSeeder extends Seeder
         $superAdminRole = Role::firstOrCreate(['name' => 'super-admin', 'guard_name' => $adminGuard]);
         $superAdminRole->syncPermissions($adminPermissions);
 
+        $projectAdminRole = Role::firstOrCreate(['name'=>'project-admin', 'guard_name' => $adminGuard]);
+        $projectAdminRole->syncPermissions(['manage projects','manage tasks','view reports']);
+
+        $auditorRole = Role::firstOrCreate(['name'=>'auditor', 'guard_name'=>$adminGuard]);
+        $auditorRole->syncPermissions(['view reports']);
         // Assign 'super-admin' to all seeded admins
         $admins = Admin::all();
         foreach ($admins as $admin) {

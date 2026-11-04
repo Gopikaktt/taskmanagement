@@ -70,6 +70,12 @@ class TaskController extends Controller
      */
     public function create(): Response
     {
+        $staff = Auth::guard('staff')->user();
+
+        if (! $staff || ! $staff->can('create tasks')) {
+            abort(403, 'Unauthorized: You do not have permission to create tasks.');
+        }
+
         $projects = Project::orderBy('name')->get();
         return Inertia::render('Staff/Tasks/Create', compact('projects'));
     }
@@ -80,6 +86,17 @@ class TaskController extends Controller
     public function store(Request $request): JsonResponse|RedirectResponse
     {
         $staff = $request->user() ?? Auth::guard('staff')->user();
+
+        if (! $staff || ! $staff->can('create tasks')) {
+            if ($request->is('api/*') || ($request->wantsJson() && !$request->header('X-Inertia'))) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized: You do not have permission to create tasks.',
+                ], 403);
+            }
+
+            abort(403, 'Unauthorized: You do not have permission to create tasks.');
+        }
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',

@@ -58,10 +58,31 @@ class ProjectController extends Controller
     }
 
     /**
+     * Authorize project management permissions for the authenticated admin.
+     */
+    protected function authorizeProjectManagement(Request $request): void
+    {
+        $admin = $request->user() ?? Auth::guard('admin')->user();
+
+        if (! $admin || ! $admin->can('manage projects')) {
+            if ($request->is('api/*') || ($request->wantsJson() && !$request->header('X-Inertia'))) {
+                abort(response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized: You do not have permission to manage projects.',
+                ], 403));
+            }
+
+            abort(403, 'Unauthorized: You do not have permission to manage projects.');
+        }
+    }
+
+    /**
      * Show form for creating a new project.
      */
     public function create(): Response
     {
+        $this->authorizeProjectManagement(request());
+
         return Inertia::render('Admin/Projects/Create');
     }
 
@@ -70,6 +91,8 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request): JsonResponse|RedirectResponse
     {
+        $this->authorizeProjectManagement($request);
+
         $validated = $request->validated();
         $validated['created_by'] = Auth::guard('admin')->id() ?? $request->user()?->id;
 
@@ -114,6 +137,8 @@ class ProjectController extends Controller
      */
     public function edit(Project $project): Response
     {
+        $this->authorizeProjectManagement(request());
+
         return Inertia::render('Admin/Projects/Edit', [
             'project' => $project,
         ]);
@@ -124,6 +149,8 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project): JsonResponse|RedirectResponse
     {
+        $this->authorizeProjectManagement($request);
+
         $project->update($request->validated());
 
         if ($request->is('api/*') || ($request->wantsJson() && !$request->header('X-Inertia'))) {
@@ -143,6 +170,8 @@ class ProjectController extends Controller
      */
     public function destroy(Request $request, Project $project): JsonResponse|RedirectResponse
     {
+        $this->authorizeProjectManagement($request);
+
         $project->delete();
 
         if ($request->is('api/*') || ($request->wantsJson() && !$request->header('X-Inertia'))) {

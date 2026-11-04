@@ -83,6 +83,9 @@ const isCurrentUrl = (path) => {
                                 <span v-else-if="hasRole('team-lead')" style="background: #2563eb; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700;">
                                     ★ TEAM LEAD
                                 </span>
+                                <span v-else-if="hasRole('intern')" style="background: #eab308; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700;">
+                                    ★ INTERN
+                                </span>
                                 <span v-else style="background: #94a3b8; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700;">
                                     ★ MEMBER
                                 </span>
